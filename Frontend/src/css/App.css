@@ -1,0 +1,39 @@
+header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-size: large;
+  background-color: orangered;
+}
+
+footer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  font-family: 'Times New Roman', Times, serif;
+  background-color: orangered;
+  /* This will force the footer to stay at the very bottom of the page. */
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+body {
+  background-color: orange;
+}
+
+.form {
+  max-width: 300px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: orangered;
+}
+
+.media-link {
+  color: black;
+  font-weight: bold;
+  text-shadow: orangered 1px 0 10px;
+}
