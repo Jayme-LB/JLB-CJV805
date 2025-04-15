@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 // This interface will handle CRUD operations with MongoDB for the users collection.
 @Repository
 public interface UserRepository extends MongoRepository<Users, String> {
-  // This method needs to be implemented.
-  //Users findByUserName(String username);
+  
 }
