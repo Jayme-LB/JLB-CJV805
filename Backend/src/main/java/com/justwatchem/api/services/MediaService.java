@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -31,11 +32,15 @@ public class MediaService {
 
   // This method will select all media entries in the database.
   public List<Media> getAllMedia() throws Exception{
-    List<Media> media = repo.findAll(); // Return value.
+     // Sort the media (return value) by name in ascending order.
+    List<Media> media = repo.findAll(Sort.by(Sort.Direction.ASC, "name"));
 
     // Throw an exception if there's no data.
     if (media == null || media.isEmpty())
       throw new Exception("No media entries were found in the database somehow.");
+
+    // Sort the list by name in ascending order.
+
 
     return media;
   }
@@ -45,7 +50,7 @@ public class MediaService {
     Query query = new Query(); // For the MongoDB query.
     List<Media> movies; // Return value.
 
-    // Set the criteria for the query.
+    // Set the criteria for the query (media is a movie).
     query.addCriteria(Criteria.where("media_type").is("movie"));
 
     // Execute the query and add it to the list.
@@ -63,7 +68,7 @@ public class MediaService {
     Query query = new Query(); // For the MongoDB query.
     List<Media> tvShows; // Return value.
 
-    // Set the criteria for the query.
+    // Set the criteria for the query (media is a TV show).
     query.addCriteria(Criteria.where("media_type").is("tv"));
 
     // Execute the query and add it to the list.
@@ -82,7 +87,7 @@ public class MediaService {
     Query query = new Query(); // For the MongoDB query.
     List<Media> media; // Return value.
 
-    // Set the criteria for the query.
+    // Set the criteria for the query (media contains the search term).
     query.addCriteria(Criteria.where("name").regex(".*" + searchTerm + ".*", "i"));
 
     // Execute the query and add it to the list.
@@ -104,7 +109,7 @@ public class MediaService {
     if (!"true".equals(queryParam))
       throw new Exception("Featured query paramater is invalid.");
 
-    // Set the criteria for the query.
+    // Set the criteria for the query (media is a featured movie).
     query.addCriteria(Criteria.where("media_type").is("movie"));
     query.addCriteria(Criteria.where("is_featured").is(true));
 
@@ -127,7 +132,7 @@ public class MediaService {
     if (!"true".equals(queryParam))
       throw new Exception("Featured query paramater is invalid.");
 
-    // Set the criteria for the query.
+    // Set the criteria for the query (media is a featured TV show).
     query.addCriteria(Criteria.where("media_type").is("tv"));
     query.addCriteria(Criteria.where("is_featured").is(true));
 

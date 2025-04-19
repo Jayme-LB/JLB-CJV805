@@ -1,5 +1,4 @@
-import { getTitleOrName } from "../utilities/mediaPropertyHandler";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectFade, Autoplay } from "swiper/modules";
@@ -13,9 +12,26 @@ import ContentSection from "../images/ContentSection.png";
 
 // This component renders the home page that will display featured movies,
 // TV shows, and actor information.
-const Home = ({ movies, tvShows }) => {
-  const heroMedia = movies.slice(-5); // Use the last five movies in the API to use for the hero slider.
+const Home = () => {
+  const [heroMedia, setHeroMedia] = useState([]); // Uses the backdrop images in the API for the hero slider.
 
+  useEffect(() => {
+    const fetchData = () => {
+      return new Promise((resolve, reject) =>
+        fetch("http://localhost:8080/Listing")
+          .then(response => response.json())
+          .then(mediaData => resolve(mediaData))
+          .catch(err => reject(err))
+      );
+    };
+
+    // Call the above function with the proper endpoint to fetch the featured media.
+    fetchData()
+      .then(mediaData => setHeroMedia(mediaData.body))
+      .catch(err => 
+        console.error("There was a problem fetching the featured media data: ", err));
+    }, []);
+  
   return (
     <Box
       sx={{
@@ -27,7 +43,7 @@ const Home = ({ movies, tvShows }) => {
       <Swiper
         modules={[EffectFade, Autoplay]}
         effect="fade"
-        crossFade
+        crossfade="true"
         autoplay={{
           delay: 8000,
           disableOnInteraction: false
@@ -40,7 +56,7 @@ const Home = ({ movies, tvShows }) => {
             <Box
               component="img"
               src={`https://image.tmdb.org/t/p/w1280/${media.backdrop_path}`}
-              alt={`Slide #${index + 1}: ${getTitleOrName(media)}`}
+              alt={`Slide #${index + 1}: ${media.name}`}
               sx={{
                 width: "100%",
                 height: "450px",
@@ -83,8 +99,8 @@ const Home = ({ movies, tvShows }) => {
           </SwiperSlide>
         ))}
       </Swiper>
-      <Featured mediaData={movies} featuredTitle={"Featured Movies"}/>
-      <Featured mediaData={tvShows} featuredTitle={"Featured TV Shows"}/>
+      <Featured featuredMediaType={"Movies"}/>
+      <Featured featuredMediaType={"TVShows"}/>
       <Box
         sx={{
           display: "flex",

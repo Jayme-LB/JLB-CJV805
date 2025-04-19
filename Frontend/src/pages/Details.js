@@ -1,5 +1,4 @@
-import { getTitleOrName, getReleaseOrAirDate } from "../utilities/mediaPropertyHandler";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -7,14 +6,40 @@ import AppButton from "../components/AppButton";
 
 // This component renders the Details page, including the appropriate
 // movie or TV show details depending on the given URL parameter.
-const Details = ({ movies, tvShows }) => {
+const Details = () => {
   const { mediaID } = useParams(); // Grabs the route parameter from the URL.
- 
-  // Wait for data to load, then find the item
-  const mediaDetails = [...movies, ...tvShows].find(
-    (media) => String(media.id) === mediaID
-  );
- 
+  const [mediaDetails, setMediaDetails] = useState([]);
+
+  useEffect(() => {
+    const fetchData = () => {
+      return new Promise((resolve, reject) =>
+        fetch(`http://localhost:8080/Details/${mediaID}`)
+          .then(response => response.json())
+          .then(mediaData => {
+            // Convert the release date into a more user-friendly format.
+            mediaData.body.at(0).release_date = new Date(mediaData.body.at(0).release_date)
+            .toLocaleDateString("en-CA",
+              {
+                timeZone: "UTC",
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              }
+            );
+            // Return the single index of the entity body.
+            resolve(mediaData.body.at(0));
+          })
+          .catch(err => reject(err))
+      );
+    };
+
+    // Call the above function with the proper endpoint to fetch the featured media.
+    fetchData()
+      .then(mediaData => setMediaDetails(mediaData))
+      .catch(err => 
+        console.error("There was a problem fetching the media details: ", err));
+  }, []);
+    
   if (!mediaDetails) {
     return (
       <Box sx={{ padding: "20px" }}>
@@ -24,18 +49,6 @@ const Details = ({ movies, tvShows }) => {
       </Box>
     );
   }
-
-  const mediaName = getTitleOrName(mediaDetails); // Title/name of the media object.
-  const mediaDate = getReleaseOrAirDate(mediaDetails); // Initial release/air date of the media object.
-  const releaseDate = new Date(mediaDate) // Alters "mediaDate" into a more user-friendly format.
-    .toLocaleDateString("en-CA",
-      {
-        timeZone: "UTC",
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      }
-  );
 
   return (
     <Box>
@@ -56,7 +69,7 @@ const Details = ({ movies, tvShows }) => {
             textShadow: "1px 1px 1px black, 4px 4px 3px orangered",
           }}
         >
-          {mediaName}
+          {mediaDetails.name}
         </Typography>
         <Box
           sx={{
@@ -66,7 +79,7 @@ const Details = ({ movies, tvShows }) => {
         >
           <Box
             component="img"
-            alt={mediaName}
+            alt={mediaDetails.name}
             src={`https://image.tmdb.org/t/p/w342/${mediaDetails.poster_path}`}
             sx={{
               borderRadius: "10px",
@@ -82,7 +95,7 @@ const Details = ({ movies, tvShows }) => {
                 textShadow: "1px 1px 1px black, 2px 2px 2px orangered",
               }}
             >
-              Released on {releaseDate}
+              Released on {mediaDetails.release_date}
             </Typography>
             <Typography
               variant="body1"
@@ -93,8 +106,8 @@ const Details = ({ movies, tvShows }) => {
             >
               {mediaDetails.overview}
             </Typography>
-            <AppButton variant="outlined">Buy for $19.99</AppButton>
-            <AppButton variant="outlined">Rent for $5.99</AppButton>
+            <AppButton variant="outlined">Buy for ${mediaDetails.price}</AppButton>
+            <AppButton variant="outlined">Rent for ${mediaDetails.rental_price}</AppButton>
           </Box>
         </Box>
       </Box>

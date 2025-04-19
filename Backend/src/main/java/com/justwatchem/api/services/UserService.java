@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +16,13 @@ import com.justwatchem.api.models.Users;
 
 // This class will communicate with the MongoDB collection.
 @Service
-public class UserService implements UserDetailsService{
+public class UserService{
   @Autowired
   private UserRepository repo; // For calling methods from the UserRepository/MongoRepository interface.
   @Autowired
   private MongoTemplate mongo; // For more complex queries that the MovieRepository can't handle.
+  @Autowired
+  private BCryptPasswordEncoder passwordEncoder;
 
   // This method will add a new user to the database.
   public Users addUser(Users user) throws Exception{
@@ -66,7 +65,7 @@ public class UserService implements UserDetailsService{
 
   // This method will select a user from the database that
   // matches the given email and (encrypted) password.
-  public Users getUserLogin(String email, String password) throws Exception{
+  public Users getUserLogin(String email, String password) throws BadCredentialsException{
     Query query = new Query(); // For the MongoDB query.
     Users user; // Return value.
 
@@ -74,35 +73,10 @@ public class UserService implements UserDetailsService{
     query.addCriteria(Criteria.where("email").is(email));
     user = mongo.findOne(query, Users.class);
     if (user == null)
-      throw new Exception("That username is invalid.");
-    else if (!new BCryptPasswordEncoder().matches(password, user.getPassword()))
-      throw new Exception("That password is invalid.");
+      throw new BadCredentialsException("That username is invalid.");
+    else if (!passwordEncoder.matches(password, user.getPassword()))
+      throw new BadCredentialsException("That password is invalid.");
 
     return user;
-  }
-
-  // This method attempts to retrieve the given username (i.e. email address)
-  // from the database.
-  @Override
-  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    Query query = new Query(); // For the MongoDB query.
-    Users user; // Return value.
-    UserDetails userDetails;
-
-    // Throw an exception if the username is not found.
-    query.addCriteria(Criteria.where("email").is(email));
-    user = mongo.findOne(query, Users.class);
-    if (user == null)
-      throw new UsernameNotFoundException("That user does not exist.");
-
-    userDetails = User.withUsername(user.getEmail())
-    .password(new BCryptPasswordEncoder().encode(user.getPassword()))
-    .roles("user")
-    .build();
-
-    return userDetails;
-
-    // TODO Auto-generated method stub
-    //throw new UnsupportedOperationException("Unimplemented method 'loadUserByUsername'");
   }
 }

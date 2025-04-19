@@ -19,7 +19,7 @@ import com.justwatchem.api.ServerResponse;
 import com.justwatchem.api.models.Media;
 import com.justwatchem.api.services.MediaService;
 
-// This class is the Spring REST controller that listens to GET/POST requests
+// This class is the Spring REST controller that listens to HTTP requests
 // coming from the client-side and handles them here, on the server-side.
 @RestController
 public class MediaController {
@@ -28,6 +28,7 @@ public class MediaController {
   
   // This method will create/add a new media entry to the API.
   // NOTE: The "consumes" parameter tells Spring Boot that the POST data is a JSON object.
+  @SuppressWarnings("rawtypes")
   @PostMapping(value="/Details", consumes={MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity addMedia(@RequestBody Media media){
     ServerResponse response; // First argument of the return value that holds the media details, if it is valid.
@@ -49,6 +50,7 @@ public class MediaController {
   }
 
   // This method will return all media entries from the API.
+  @SuppressWarnings("rawtypes")
   @GetMapping("/Listing")
   public ResponseEntity getAllMedia(){
     ServerResponse response; // First argument of the return value that holds all media details.
@@ -67,6 +69,7 @@ public class MediaController {
   }
 
   // This method will return all movie entries from the API.
+  @SuppressWarnings("rawtypes")
   @GetMapping("/Listing/Movies")
   public ResponseEntity getAllMovies(){
     ServerResponse response; // First argument of the return value that holds all movie details.
@@ -85,6 +88,7 @@ public class MediaController {
   }
 
   // This method will return all TV show entries from the API.
+  @SuppressWarnings("rawtypes")
   @GetMapping("/Listing/TVShows")
   public ResponseEntity getAllTVShows(){
     ServerResponse response; // First argument of the return value that holds all TV show details.
@@ -103,6 +107,7 @@ public class MediaController {
   }
 
   // This method will return all media entries from the API that contain the search term.
+  @SuppressWarnings("rawtypes")
   @GetMapping("/Listing/{searchTerm}")
   public ResponseEntity getAllMedia(@PathVariable("searchTerm") String searchTerm){
     ServerResponse response; // First argument of the return value that holds all relevant media details.
@@ -121,7 +126,8 @@ public class MediaController {
   }
 
   // This method will return all featured movies from the API.
-  @GetMapping("/Listing/Movies/Featured")
+  @SuppressWarnings("rawtypes")
+	@GetMapping("/Listing/Movies/Featured")
   public ResponseEntity getAllFeaturedMovies(@RequestParam(value = "featured") String queryParam){
     ServerResponse response; // First argument of the return value that holds all featured movie details.
     HttpStatus status; // Second argument of the return value that holds a proper HTTP response status.
@@ -139,7 +145,8 @@ public class MediaController {
   }
 
   // This method will return all featured TV shows from the API.
-  @GetMapping("/Listing/TVShows/Featured")
+  @SuppressWarnings("rawtypes")
+	@GetMapping("/Listing/TVShows/Featured")
   public ResponseEntity getAllFeaturedTVShows(@RequestParam(value = "featured") String queryParam){
     ServerResponse response; // First argument of the return value that holds all featured TV show details.
     HttpStatus status; // Second argument of the return value that holds a proper HTTP response status.
@@ -157,6 +164,7 @@ public class MediaController {
   }
 
   // This method will return a media entry from the API, based on the given route parameter.
+  @SuppressWarnings("rawtypes")
   @GetMapping("/Details/{mediaID}")
   public ResponseEntity getMedia(@PathVariable("mediaID") String id){
     ServerResponse response; // First argument of the return value that holds the media details, if the ID is found.
@@ -175,6 +183,7 @@ public class MediaController {
   }
 
   // This method will edit a media entry in the API, based on the given route parameter.
+  @SuppressWarnings("rawtypes")
   @PutMapping(value = "/Details/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity updateMedia(@PathVariable("id") String id, @RequestBody Media updatedMedia){
     ServerResponse response; // First argument of the return value that holds the media details, if the ID is found.
@@ -193,6 +202,7 @@ public class MediaController {
   }
 
   // This method will delete a media entry from the API, based on the given route parameter.
+  @SuppressWarnings("rawtypes")
   @DeleteMapping("/Details/{mediaID}")
   public ResponseEntity deleteMedia(@PathVariable("mediaID") String id){
     ServerResponse response; // First argument of the return value that holds the media details, if it is valid.
